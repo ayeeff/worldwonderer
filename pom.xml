@@ -73,7 +73,7 @@
                 <configuration>
                     <mainClass>flight.FlightSearchDemo</mainClass>
                     <cleanupDaemonThreads>false</cleanupDaemonThreads>
-                    <!-- Include test classes on classpath when running with --test -->
+                    <!-- Include test classes on classpath when running with test flag -->
                     <includePluginDependencies>false</includePluginDependencies>
                     <classpathScope>test</classpathScope>
                 </configuration>
