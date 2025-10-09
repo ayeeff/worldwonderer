@@ -17,6 +17,7 @@
     </properties>
 
     <dependencies>
+        <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -33,11 +34,14 @@
 
     <build>
         <plugins>
+            <!-- Maven Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
             </plugin>
+
+            <!-- Maven Surefire Plugin (for running tests) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -51,6 +55,16 @@
                         <usePhrasedClassNameInRunning>true</usePhrasedClassNameInRunning>
                         <usePhrasedClassNameInTestCaseSummary>true</usePhrasedClassNameInTestCaseSummary>
                     </statelessTestsetInfoReporter>
+                </configuration>
+            </plugin>
+
+            <!-- Maven Exec Plugin (for running main classes) -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>flight.FlightSearchDemo</mainClass>
                 </configuration>
             </plugin>
         </plugins>
