@@ -1,57 +1,52 @@
-# 🌍 WorldWanderer Assignment 4: Flight Search Validation
+# WorldWanderer Flight Search Validation
 
-[![Java](https://img.shields.io/badge/Java-17-blue.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-[![JUnit 5](https://img.shields.io/badge/JUnit-5.10.3-green.svg)](https://junit.org/junit5/)
+## Overview
+This is a Java 17 Maven project that implements flight search parameter validation for the WorldWanderer booking system. It validates 11 different conditions before allowing a flight search to proceed.
 
-This repository contains the implementation and unit tests for **Activity 1** of Assignment 4 (Git and Unit Testing) for the **WorldWanderer** flight booking system.  
-It implements the `runFlightSearch` method in the `FlightSearch` class, validating flight search parameters against **11 specified conditions** (e.g., passenger limits, date formats, airport codes).
+## Project Structure
+- **Language**: Java 17
+- **Build Tool**: Maven
+- **Testing Framework**: JUnit Jupiter 5.10.0
+- **Main Class**: `src/main/java/flight/FlightSearch.java`
+- **Test Class**: `src/test/java/flight/FlightSearchTest.java`
 
----
+## Validation Rules
+The `runFlightSearch` method validates:
+1. Total passengers (1-9)
+2. No children in emergency rows or first class
+3. No infants in emergency rows or business class
+4. Max 2 children per adult
+5. Max 1 infant per adult
+6. Departure date not in the past
+7. Valid DD/MM/YYYY date format (strict leap year checking)
+8. Return date after departure date
+9. Valid seating class (economy/premium economy/business/first)
+10. Emergency row only in economy class
+11. Valid and distinct IATA airport codes
 
-## 🧠 Overview
+## Recent Changes
+- **2025-10-09**: Project imported and configured for Replit environment
+  - Fixed pom.xml to use proper XML format
+  - Updated Java version from 11 to 17 in pom.xml
+  - Fixed test file compilation issues
+  - Added strict date validation using ResolverStyle.STRICT
+  - All 12 JUnit tests now passing
 
-The project ensures that all flight search inputs meet strict validation rules before a search is executed.  
-If all inputs are valid, private fields are initialized and the method returns `true`.  
-Otherwise, it returns `false` without changing any fields.
+## Running the Project
+- **Build**: `mvn compile`
+- **Test**: `mvn test` (runs automatically via the Tests workflow)
+- **Demo**: `mvn compile exec:java -Dexec.mainClass="flight.FlightSearchDemo"`
+- **Clean**: `mvn clean`
 
-- **Language:** Java 17  
-- **Testing:** JUnit Jupiter 5
-# 🌍 WorldWanderer Assignment 4 – Flight Search Validation
+## Architecture
+- Main validation class: `FlightSearch.java` with business logic
+- Demo application: `FlightSearchDemo.java` for interactive demonstration
+- Comprehensive test suite with 12 test methods covering all validation rules
+- Uses Java's DateTimeFormatter with strict resolver for proper date validation
+- Immutable whitelists for airports and seating classes
 
-[![Java](https://img.shields.io/badge/Java-17-blue.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-[![JUnit 5](https://img.shields.io/badge/JUnit-5.10.3-green.svg)](https://junit.org/junit5/)
-
-Implements and tests the **`runFlightSearch`** method for the WorldWanderer flight booking system.  
-Validates inputs against **11 rules** (passenger limits, date formats, airport codes, etc.) and runs **26 JUnit 5 boundary tests** — all pass.
-
----
-
-## ✈️ Overview
-- Returns `true` and initializes private fields only if all 11 conditions are valid; otherwise returns `false`.  
-- Single merged file: **`FlightSearch.java`** (implementation + tests).  
-- Current date fixed at **08/10/2025** for reproducible results.  
-- Tested using **Java 17** and **JUnit Jupiter 5.10.3**.
-
----
-
-## ✅ Validation Rules
-1. Total passengers 1–9  
-2. No children in emergency rows or first class  
-3. No infants in emergency rows or business class  
-4. ≤2 children per adult  
-5. ≤1 infant per adult  
-6. Departure not in the past  
-7. Valid `DD/MM/YYYY` date (checks leap years)  
-8. Return date after departure  
-9. Class = economy / premium economy / business / first  
-10. Emergency row only in economy  
-11. Different, valid IATA airports  
-
----
-
-## 🧪 Usage
-```java
-FlightSearch fs = new FlightSearch();
-boolean valid = fs.runFlightSearch(
-  "08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 1, 0, 0);
-System.out.println(valid); // true
+## Files
+- `src/main/java/flight/FlightSearch.java` - Core validation logic
+- `src/main/java/flight/FlightSearchDemo.java` - Demo application
+- `src/test/java/flight/FlightSearchTest.java` - JUnit test suite
+- `pom.xml` - Maven configuration
