@@ -12,6 +12,14 @@ public class FlightSearchDemo {
             return;
         }
         
+        // Check if user wants both demo and tests
+        if (args.length > 0 && args[0].equals("--all")) {
+            runDemo();
+            System.out.println("\n");
+            runTestsWithReflection();
+            return;
+        }
+        
         // Otherwise run the normal demo
         runDemo();
     }
