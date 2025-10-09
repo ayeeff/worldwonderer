@@ -6,9 +6,10 @@ This is a Java 17 Maven project that implements flight search parameter validati
 ## Project Structure
 - **Language**: Java 17
 - **Build Tool**: Maven
-- **Testing Framework**: JUnit Jupiter 5.10.0
+- **Testing Framework**: JUnit Jupiter 5.10.3
 - **Main Class**: `src/main/java/flight/FlightSearch.java`
 - **Test Class**: `src/test/java/flight/FlightSearchTest.java`
+- **Demo Class**: `src/main/java/flight/FlightSearchDemo.java`
 
 ## Validation Rules
 The `runFlightSearch` method validates:
@@ -24,29 +25,111 @@ The `runFlightSearch` method validates:
 10. Emergency row only in economy class
 11. Valid and distinct IATA airport codes
 
-## Recent Changes
-- **2025-10-09**: Project imported and configured for Replit environment
-  - Fixed pom.xml to use proper XML format
-  - Updated Java version from 11 to 17 in pom.xml
-  - Fixed test file compilation issues
-  - Added strict date validation using ResolverStyle.STRICT
-  - All 12 JUnit tests now passing
-
 ## Running the Project
+
+### 1. Demo Only (shows search parameters and validation)
+```bash
+mvn exec:java
+```
+Shows a sample flight search with validation results and stored flight details.
+
+### 2. Tests Only (shows 12 test results with detailed descriptions)
+```bash
+mvn test-compile exec:java -Dexec.args="--test"
+```
+Runs all 12 tests with detailed condition descriptions. Each test shows which condition is being validated and whether it passed or failed.
+
+### 3. Both Demo AND Tests
+```bash
+mvn test-compile exec:java -Dexec.args="--all"
+```
+Runs the demo followed by all tests with detailed descriptions.
+
+### 4. Standard JUnit Tests (summary only)
+```bash
+mvn test
+```
+Runs JUnit tests through Maven with standard test output (method names only, no detailed descriptions).
+
+### Other Commands
 - **Build**: `mvn compile`
-- **Test**: `mvn test` (runs automatically via the Tests workflow)
-- **Demo**: `mvn compile exec:java -Dexec.mainClass="flight.FlightSearchDemo"`
 - **Clean**: `mvn clean`
+- **Clean and rebuild**: `mvn clean install`
 
 ## Architecture
-- Main validation class: `FlightSearch.java` with business logic
-- Demo application: `FlightSearchDemo.java` for interactive demonstration
-- Comprehensive test suite with 12 test methods covering all validation rules
+- **Main validation class**: `FlightSearch.java` with business logic
+- **Demo application**: `FlightSearchDemo.java` for interactive demonstration
+  - Runs demo with sample data (default)
+  - Runs tests with detailed descriptions (`--test` flag)
+  - Runs both demo and tests (`--all` flag)
+- **Comprehensive test suite**: `FlightSearchTest.java` with 12 test methods covering all validation rules
 - Uses Java's DateTimeFormatter with strict resolver for proper date validation
 - Immutable whitelists for airports and seating classes
+- Single source of truth: test logic only in FlightSearchTest.java, called via reflection from demo
+
+## Test Coverage
+- **12 test methods** covering:
+  - 11 validation conditions (with boundary testing)
+  - 4 valid flight search combinations
+- **26 total assertions** (each test method contains 2+ assertions)
+- **100% success rate** when all conditions are properly validated
 
 ## Files
 - `src/main/java/flight/FlightSearch.java` - Core validation logic
-- `src/main/java/flight/FlightSearchDemo.java` - Demo application
-- `src/test/java/flight/FlightSearchTest.java` - JUnit test suite
-- `pom.xml` - Maven configuration
+- `src/main/java/flight/FlightSearchDemo.java` - Demo application with test runner
+- `src/test/java/flight/FlightSearchTest.java` - JUnit 5 test suite
+- `pom.xml` - Maven configuration with exec plugin for easy execution
+
+## Example Output
+
+### Demo Mode (`mvn exec:java`)
+```
+=== WorldWanderer Flight Search Validation Demo ===
+
+Search Parameters:
+  Departure: 16/10/2025 from SYD
+  Return: 23/10/2025 from MEL
+  Class: economy (no emergency row)
+  Passengers: 2 adults, 1 child, 0 infants
+
+Validation Result: VALID ✓
+
+Stored Flight Details:
+  Departure Date: 16/10/2025
+  Departure Airport: SYD
+  Return Date: 23/10/2025
+  Destination Airport: MEL
+  Seating Class: economy
+  Adults: 2
+  Children: 1
+  Infants: 0
+  Emergency Row: No
+```
+
+### Test Mode (`mvn test-compile exec:java -Dexec.args="--test"`)
+```
+================================================================================
+Running FlightSearch Tests with Detailed Descriptions
+================================================================================
+
+Testing: Condition 1: Total passengers <1 (boundary: 0) and >9 (boundary: 10) ... ✓ PASS
+Testing: Condition 2: Children in emergency row seating or first class ... ✓ PASS
+Testing: Condition 3: Infants in emergency row seating or business class ... ✓ PASS
+Testing: Condition 4: Children >2 per adult (boundary: 3 children with 1 adult) ... ✓ PASS
+Testing: Condition 5: Infants >1 per adult (boundary: 2 infants with 1 adult) ... ✓ PASS
+Testing: Condition 6: Departure date in past (boundary: day before current) ... ✓ PASS
+Testing: Condition 7: Invalid date (29/02/2026, non-leap year) and invalid date (31/04) ... ✓ PASS
+Testing: Condition 8: Return date before departure and same-day valid ... ✓ PASS
+Testing: Condition 9: Invalid seating class (luxury) and valid (premium economy) ... ✓ PASS
+Testing: Condition 10: Emergency row in non-economy (business) and valid (economy) ... ✓ PASS
+Testing: Condition 11: Same departure/destination airport and invalid airport code ... ✓ PASS
+Testing: All inputs valid - Test Data 1-4 (multiple valid combinations) ... ✓ PASS
+
+================================================================================
+Test Execution Summary:
+  Total Tests: 12
+  Passed:      12 ✓
+  Failed:      0
+  Success Rate: 100%
+================================================================================
+```
