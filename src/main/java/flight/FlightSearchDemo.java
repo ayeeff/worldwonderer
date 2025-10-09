@@ -2,16 +2,13 @@ package flight;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
 
 public class FlightSearchDemo {
-    
-    private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     
     public static void main(String[] args) {
         // Check if user wants to run tests
         if (args.length > 0 && args[0].equals("--test")) {
-            runAllTestsWithDescriptions();
+            runTestsWithReflection();
             return;
         }
         
@@ -20,167 +17,68 @@ public class FlightSearchDemo {
     }
     
     /**
-     * Run all tests with detailed descriptions (standalone, no JUnit dependency).
+     * Run JUnit tests using reflection to show detailed descriptions.
+     * This avoids duplicating test logic - we reuse FlightSearchTest from test scope.
      */
-    public static void runAllTestsWithDescriptions() {
+    private static void runTestsWithReflection() {
         System.out.println("=".repeat(80));
         System.out.println("Running FlightSearch Tests with Detailed Descriptions");
         System.out.println("=".repeat(80) + "\n");
         
         int total = 0, passed = 0, failed = 0;
-        LocalDate TODAY = LocalDate.now();
-        String TOMORROW = TODAY.plusDays(1).format(DF);
-        String NEXT_WEEK = TODAY.plusDays(7).format(DF);
-        String YESTERDAY = TODAY.minusDays(1).format(DF);
         
-        // Test 1: Condition 1 - Total passengers boundary
-        total++;
-        System.out.print("Testing: Condition 1: Total passengers <1 (boundary: 0) and >9 (boundary: 10) ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "economy", 0, 0, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "economy", 9, 1, 0);
-            if (!r1 && !r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
+        // Method names and their descriptions
+        String[][] tests = {
+            {"totalPassengersBoundary", "Condition 1: Total passengers <1 (boundary: 0) and >9 (boundary: 10)"},
+            {"childSeatRestrictions", "Condition 2: Children in emergency row seating or first class"},
+            {"infantSeatRestrictions", "Condition 3: Infants in emergency row seating or business class"},
+            {"childrenAdultRatio", "Condition 4: Children >2 per adult (boundary: 3 children with 1 adult)"},
+            {"infantAdultRatio", "Condition 5: Infants >1 per adult (boundary: 2 infants with 1 adult)"},
+            {"departureNotPast", "Condition 6: Departure date in past (boundary: day before current)"},
+            {"dateValidation", "Condition 7: Invalid date (29/02/2026, non-leap year) and invalid date (31/04)"},
+            {"returnAfterDeparture", "Condition 8: Return date before departure and same-day valid"},
+            {"seatingClass", "Condition 9: Invalid seating class (luxury) and valid (premium economy)"},
+            {"emergencyEconomyOnly", "Condition 10: Emergency row in non-economy (business) and valid (economy)"},
+            {"airportCodes", "Condition 11: Same departure/destination airport and invalid airport code"},
+            {"allValid", "All inputs valid - Test Data 1-4 (multiple valid combinations)"}
+        };
         
-        // Test 2: Condition 2 - Children restrictions
-        total++;
-        System.out.print("Testing: Condition 2: Children in emergency row seating or first class ... ");
         try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", true, NEXT_WEEK, "mel", "first", 1, 1, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", true, NEXT_WEEK, "mel", "economy", 1, 1, 0);
-            if (!r1 && !r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 3: Condition 3 - Infant restrictions
-        total++;
-        System.out.print("Testing: Condition 3: Infants in emergency row seating or business class ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", true, NEXT_WEEK, "mel", "business", 1, 0, 1);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", true, NEXT_WEEK, "mel", "economy", 1, 0, 1);
-            if (!r1 && !r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 4: Condition 4 - Children per adult ratio
-        total++;
-        System.out.print("Testing: Condition 4: Children >2 per adult (boundary: 3 children with 1 adult) ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "economy", 1, 3, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "economy", 2, 4, 0);
-            if (!r1 && r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 5: Condition 5 - Infants per adult ratio
-        total++;
-        System.out.print("Testing: Condition 5: Infants >1 per adult (boundary: 2 infants with 1 adult) ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "economy", 1, 0, 2);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "economy", 0, 0, 1);
-            if (!r1 && !r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 6: Condition 6 - Departure not in past
-        total++;
-        System.out.print("Testing: Condition 6: Departure date in past (boundary: day before current) ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(YESTERDAY, "syd", false, NEXT_WEEK, "mel", "economy", 1, 0, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "economy", 1, 0, 0);
-            if (!r1 && r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 7: Condition 7 - Date validation
-        total++;
-        System.out.print("Testing: Condition 7: Invalid date (29/02/2026, non-leap year) and invalid date (31/04) ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch("29/02/2026", "syd", false, "07/03/2026", "mel", "economy", 1, 0, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch("31/04/2025", "syd", false, "07/05/2025", "mel", "economy", 1, 0, 0);
-            if (!r1 && !r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 8: Condition 8 - Return after departure
-        total++;
-        System.out.print("Testing: Condition 8: Return date before departure and same-day valid ... ");
-        try {
-            String dayBefore = TODAY.plusDays(1).minusDays(1).format(DF);
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", false, dayBefore, "mel", "economy", 1, 0, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", false, TOMORROW, "mel", "economy", 1, 0, 0);
-            if (!r1 && r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 9: Condition 9 - Seating class validation
-        total++;
-        System.out.print("Testing: Condition 9: Invalid seating class (luxury) and valid (premium economy) ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "luxury", 1, 0, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "mel", "premium economy", 1, 0, 0);
-            if (!r1 && r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 10: Condition 10 - Emergency row only in economy
-        total++;
-        System.out.print("Testing: Condition 10: Emergency row in non-economy (business) and valid (economy) ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", true, NEXT_WEEK, "mel", "business", 1, 0, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "syd", true, NEXT_WEEK, "mel", "economy", 1, 0, 0);
-            if (!r1 && r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 11: Condition 11 - Airport codes
-        total++;
-        System.out.print("Testing: Condition 11: Same departure/destination airport and invalid airport code ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", false, NEXT_WEEK, "syd", "economy", 1, 0, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "xyz", false, NEXT_WEEK, "mel", "economy", 1, 0, 0);
-            if (!r1 && !r2) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
-        
-        // Test 12: All valid combinations
-        total++;
-        System.out.print("Testing: All inputs valid - Test Data 1-4 (multiple valid combinations) ... ");
-        try {
-            FlightSearch fs1 = new FlightSearch();
-            boolean r1 = fs1.runFlightSearch(TOMORROW, "syd", false, TODAY.plusDays(14).format(DF), "pvg", "economy", 2, 2, 0);
-            FlightSearch fs2 = new FlightSearch();
-            boolean r2 = fs2.runFlightSearch(TOMORROW, "mel", false, TODAY.plusDays(21).format(DF), "lax", "economy", 1, 0, 1);
-            FlightSearch fs3 = new FlightSearch();
-            boolean r3 = fs3.runFlightSearch(TOMORROW, "doh", true, TODAY.plusDays(10).format(DF), "cdg", "economy", 3, 0, 0);
-            FlightSearch fs4 = new FlightSearch();
-            boolean r4 = fs4.runFlightSearch(TOMORROW, "del", false, TODAY.plusDays(5).format(DF), "syd", "premium economy", 1, 1, 0);
-            if (r1 && r2 && r3 && r4) { System.out.println("✓ PASS"); passed++; }
-            else { System.out.println("✗ FAIL"); failed++; }
-        } catch (Exception e) { System.out.println("✗ ERROR: " + e.getMessage()); failed++; }
+            // Try to load the test class (will fail if running from compiled JAR without test classes)
+            Class<?> testClass = Class.forName("flight.FlightSearchTest");
+            
+            for (String[] test : tests) {
+                total++;
+                String methodName = test[0];
+                String description = test[1];
+                System.out.print("Testing: " + description + " ... ");
+                
+                try {
+                    Object testInstance = testClass.getDeclaredConstructor().newInstance();
+                    java.lang.reflect.Method method = testClass.getDeclaredMethod(methodName);
+                    method.setAccessible(true);
+                    method.invoke(testInstance);
+                    System.out.println("✓ PASS");
+                    passed++;
+                } catch (java.lang.reflect.InvocationTargetException e) {
+                    Throwable cause = e.getCause();
+                    System.out.println("✗ FAIL");
+                    if (cause != null) {
+                        System.out.println("  Error: " + cause.getMessage());
+                    }
+                    failed++;
+                } catch (Exception e) {
+                    System.out.println("✗ ERROR");
+                    System.out.println("  Error: " + e.getMessage());
+                    failed++;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            System.out.println("ERROR: FlightSearchTest class not found.");
+            System.out.println("This usually means test classes aren't on the classpath.");
+            System.out.println("Try running: mvn test-compile exec:java -Dexec.args='--test' -Dexec.classpathScope=test");
+            System.exit(1);
+        }
         
         System.out.println("\n" + "=".repeat(80));
         System.out.println("Test Execution Summary:");
