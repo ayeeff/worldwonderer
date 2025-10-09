@@ -3,13 +3,14 @@ package flight;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import org.junit.jupiter.api.*;
 
 /** JUnit-5 test class for FlightSearch::runFlightSearch */
 class FlightSearchTest {
 
     /* ---------- helper to build yesterday / today / tomorrow ---------- */
-    private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     private static final LocalDate TODAY = LocalDate.now();
     private static final String TODAY_STR = TODAY.format(DF);
     private static final String YESTERDAY_STR = TODAY.minusDays(1).format(DF);
@@ -29,13 +30,13 @@ class FlightSearchTest {
     }
 
     @Test @DisplayName("C2 – child in emergency row or first") void childSeatRestrictions() {
-        assertFalse(search(1,1,0,true,"first"));
-        assertFalse(search(1,1,0,true,"economy"));
+        assertFalse(search(1,1,0,true,"first",VALID_DEP,VALID_DES,VALID_DEP_DATE,VALID_RET_DATE));
+        assertFalse(search(1,1,0,true,"economy",VALID_DEP,VALID_DES,VALID_DEP_DATE,VALID_RET_DATE));
     }
 
     @Test @DisplayName("C3 – infant in emergency row or business") void infantSeatRestrictions() {
-        assertFalse(search(1,0,1,true,"business"));
-        assertFalse(search(1,0,1,true,"economy"));
+        assertFalse(search(1,0,1,true,"business",VALID_DEP,VALID_DES,VALID_DEP_DATE,VALID_RET_DATE));
+        assertFalse(search(1,0,1,true,"economy",VALID_DEP,VALID_DES,VALID_DEP_DATE,VALID_RET_DATE));
     }
 
     @Test @DisplayName("C4 – children per adult ratio") void childrenAdultRatio() {
@@ -59,7 +60,8 @@ class FlightSearchTest {
     }
 
     @Test @DisplayName("C8 – return not before departure") void returnAfterDeparture() {
-        assertFalse(search(VALID_DEP_DATE, VALID_DEP_DATE.minusDays(1)));
+        String dayBeforeDep = TODAY.plusDays(1).minusDays(1).format(DF);
+        assertFalse(search(VALID_DEP_DATE, dayBeforeDep));
         assertTrue(search(VALID_DEP_DATE, VALID_DEP_DATE));
     }
 
@@ -74,8 +76,8 @@ class FlightSearchTest {
     }
 
     @Test @DisplayName("C11 – airport whitelist & distinct") void airportCodes() {
-        assertFalse(search("syd","syd"));
-        assertFalse(search("xyz","mel"));
+        assertFalse(search(1,0,0,false,VALID_CLASS,"syd","syd",VALID_DEP_DATE,VALID_RET_DATE));
+        assertFalse(search(1,0,0,false,VALID_CLASS,"xyz","mel",VALID_DEP_DATE,VALID_RET_DATE));
     }
 
     @Test @DisplayName("All-valid combinations") void allValid() {
@@ -90,7 +92,6 @@ class FlightSearchTest {
     private boolean search(boolean em, String cl){ return search(1,0,0,em,cl,VALID_DEP,VALID_DES,VALID_DEP_DATE,VALID_RET_DATE); }
     private boolean search(String cl){ return search(1,0,0,false,cl,VALID_DEP,VALID_DES,VALID_DEP_DATE,VALID_RET_DATE); }
     private boolean search(String depDate, String retDate){ return search(1,0,0,false,VALID_CLASS,VALID_DEP,VALID_DES,depDate,retDate); }
-    private boolean search(String depCode, String desCode){ return search(1,0,0,false,VALID_CLASS,depCode,desCode,VALID_DEP_DATE,VALID_RET_DATE); }
 
     /* ---------- master helper ---------- */
     private boolean search(int a,int c,int i,boolean em,String cl,String dep,String des,String depDate,String retDate){

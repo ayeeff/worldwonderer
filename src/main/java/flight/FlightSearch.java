@@ -3,6 +3,7 @@ package flight;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Set;
 
 public class FlightSearch {
@@ -21,7 +22,7 @@ public class FlightSearch {
     /* ---------------------- white-lists & const --------------------- */
     private static final Set<String> AIRPORTS = Set.of("syd","mel","lax","cdg","del","pvg","doh");
     private static final Set<String> CLASSES  = Set.of("economy","premium economy","business","first");
-    private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     /* ---------------------- main business method -------------------- */
     public boolean runFlightSearch(String departureDate,
