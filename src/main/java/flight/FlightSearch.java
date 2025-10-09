@@ -91,7 +91,7 @@ public class FlightSearch {
         return true;
     }
 
-    /* -------------------- getters (optional) ----------------------- */
+    /* -------------------- getters ----------------------- */
     public String getDepartureDate() { return departureDate; }
     public String getDepartureAirportCode() { return departureAirportCode; }
     public boolean isEmergencyRowSeating() { return emergencyRowSeating; }
