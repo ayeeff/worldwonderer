@@ -9,6 +9,12 @@ import java.util.Map;
 public class FlightSearchDemo {
     
     public static void main(String[] args) {
+        // Debug: print received arguments
+        System.out.println("Received " + args.length + " arguments");
+        for (int i = 0; i < args.length; i++) {
+            System.out.println("arg[" + i + "] = '" + args[i] + "'");
+        }
+        
         // Check if user wants to run tests
         if (args.length > 0 && args[0].equals("--test")) {
             runAllTestsWithDescriptions();
