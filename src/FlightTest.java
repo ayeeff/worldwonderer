@@ -63,7 +63,7 @@ public class FlightSearch {
     }
 
     /**
-     * Validates flight search parameters against all specified conditions.
+     * Validates flight search parameters against all specified conditions in numbered rank order.
      * If all conditions are met, initializes class attributes and returns true.
      * Otherwise, returns false without initializing attributes.
      */
@@ -71,42 +71,13 @@ public class FlightSearch {
                                    String returnDate, String destinationAirportCode, String seatingClass, 
                                    int adultPassengerCount, int childPassengerCount, int infantPassengerCount) {
         // Step 1: Validate and parse dates (Condition 7: format and validity)
-        LocalDate now = LocalDate.of(2025, 10, 8);  // Hardcoded current date for consistent testing
+        LocalDate now = LocalDate.of(2025, 10, 10);  // Updated current date for consistent testing
         LocalDate depDate = validateAndParseDate(departureDate);
         if (depDate == null) {
             return false;
         }
         LocalDate retDate = validateAndParseDate(returnDate);
         if (retDate == null) {
-            return false;
-        }
-
-        // Condition 6: Departure not in past
-        if (depDate.isBefore(now)) {
-            return false;
-        }
-
-        // Condition 8: Return after departure
-        if (retDate.isBefore(depDate)) {
-            return false;
-        }
-
-        // Condition 11: Valid airports and different
-        Set<String> validAirports = Set.of("syd", "mel", "lax", "cdg", "del", "pvg", "doh");
-        if (!validAirports.contains(departureAirportCode) || 
-            !validAirports.contains(destinationAirportCode) || 
-            departureAirportCode.equals(destinationAirportCode)) {
-            return false;
-        }
-
-        // Condition 9: Valid seating class
-        Set<String> validClasses = Set.of("economy", "premium economy", "business", "first");
-        if (!validClasses.contains(seatingClass)) {
-            return false;
-        }
-
-        // Condition 10: Emergency row only in economy
-        if (emergencyRowSeating && !"economy".equals(seatingClass)) {
             return false;
         }
 
@@ -136,6 +107,35 @@ public class FlightSearch {
             return false;
         }
 
+        // Condition 6: Departure not in past
+        if (depDate.isBefore(now)) {
+            return false;
+        }
+
+        // Condition 8: Return after departure
+        if (retDate.isBefore(depDate)) {
+            return false;
+        }
+        
+        // Condition 9: Valid seating class
+        Set<String> validClasses = Set.of("economy", "premium economy", "business", "first");
+        if (!validClasses.contains(seatingClass)) {
+            return false;
+        }
+        
+        // Condition 10: Emergency row only in economy
+        if (emergencyRowSeating && !"economy".equals(seatingClass)) {
+            return false;
+        }
+        
+        // Condition 11: Valid airports and different
+        Set<String> validAirports = Set.of("syd", "mel", "lax", "cdg", "del", "pvg", "doh");
+        if (!validAirports.contains(departureAirportCode) || 
+            !validAirports.contains(destinationAirportCode) || 
+            departureAirportCode.equals(destinationAirportCode)) {
+            return false;
+        }
+        
         // All conditions met: Initialize attributes
         this.departureDate = departureDate;
         this.departureAirportCode = departureAirportCode;
@@ -174,98 +174,98 @@ class FlightSearchTest {
     // Condition 1: Total <1
     @Test
     void testTotalPassengersLessThan1_AllZero() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 0, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 0, 0, 0);
         assertFalse(result);
     }
 
     @Test
     void testTotalPassengersLessThan1_ZeroVariation() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 0, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 0, 0, 0);
         assertFalse(result);
     }
 
     // Condition 1: Total >9
     @Test
     void testTotalPassengersGreaterThan9_Adult10() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 10, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 10, 0, 0);
         assertFalse(result);
     }
 
     @Test
     void testTotalPassengersGreaterThan9_Mixed10() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 5, 5, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 5, 5, 0);
         assertFalse(result);
     }
 
     // Condition 2: Children in emergency/first
     @Test
     void testChildrenInEmergencyRow() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", true, "15/10/2025", "mel", "economy", 1, 1, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", true, "19/10/2025", "mel", "economy", 1, 1, 0);
         assertFalse(result);
     }
 
     @Test
     void testChildrenInFirstClass() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "first", 1, 1, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "first", 1, 1, 0);
         assertFalse(result);
     }
 
     // Condition 3: Infants in emergency/business
     @Test
     void testInfantsInEmergencyRow() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", true, "15/10/2025", "mel", "economy", 1, 0, 1);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", true, "19/10/2025", "mel", "economy", 1, 0, 1);
         assertFalse(result);
     }
 
     @Test
     void testInfantsInBusinessClass() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "business", 1, 0, 1);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "business", 1, 0, 1);
         assertFalse(result);
     }
 
     // Condition 4: Children >2 per adult
     @Test
     void testChildrenExceed2PerAdult_Boundary3() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 1, 3, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 1, 3, 0);
         assertFalse(result);
     }
 
     @Test
     void testChildrenExceed2PerAdult_MixedBoundary() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 2, 5, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 2, 5, 0);
         assertFalse(result);
     }
 
     // Condition 5: Infants >1 per adult
     @Test
     void testInfantsExceed1PerAdult_Boundary2() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 1, 0, 2);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 1, 0, 2);
         assertFalse(result);
     }
 
     @Test
     void testInfantsExceed1PerAdult_MixedBoundary() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 2, 0, 3);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 2, 0, 3);
         assertFalse(result);
     }
 
     // Condition 6: Departure in past
     @Test
     void testDepartureInPast() {
-        boolean result = fs.runFlightSearch("01/10/2025", "syd", false, "15/10/2025", "mel", "economy", 1, 0, 0);
+        boolean result = fs.runFlightSearch("01/10/2025", "syd", false, "19/10/2025", "mel", "economy", 1, 0, 0);
         assertFalse(result);
     }
 
     @Test
     void testDepartureInPast_BoundaryDayBefore() {
-        boolean result = fs.runFlightSearch("07/10/2025", "syd", false, "15/10/2025", "mel", "economy", 1, 0, 0);
+        boolean result = fs.runFlightSearch("09/10/2025", "syd", false, "19/10/2025", "mel", "economy", 1, 0, 0);
         assertFalse(result);
     }
 
     // Condition 7: Invalid date
     @Test
     void testInvalidDateFormat() {
-        boolean result = fs.runFlightSearch("08-10-2025", "syd", false, "15/10/2025", "mel", "economy", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12-10-2025", "syd", false, "19/10/2025", "mel", "economy", 1, 0, 0);
         assertFalse(result);
     }
 
@@ -278,77 +278,77 @@ class FlightSearchTest {
     // Condition 8: Return before departure
     @Test
     void testReturnBeforeDeparture() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "07/10/2025", "mel", "economy", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "11/10/2025", "mel", "economy", 1, 0, 0);
         assertFalse(result);
     }
 
     @Test
     void testReturnBeforeDeparture_BoundaryWellBefore() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "01/10/2025", "mel", "economy", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "01/10/2025", "mel", "economy", 1, 0, 0);
         assertFalse(result);
     }
 
     // Condition 9: Invalid seating class
     @Test
     void testInvalidSeatingClass() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "luxury", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "luxury", 1, 0, 0);
         assertFalse(result);
     }
 
     @Test
     void testInvalidSeatingClass_BoundarySimilar() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "coach", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "coach", 1, 0, 0);
         assertFalse(result);
     }
 
     // Condition 10: Emergency in non-economy
     @Test
     void testEmergencyInBusiness() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", true, "15/10/2025", "mel", "business", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", true, "19/10/2025", "mel", "business", 1, 0, 0);
         assertFalse(result);
     }
 
     @Test
     void testEmergencyInFirst() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", true, "15/10/2025", "mel", "first", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", true, "19/10/2025", "mel", "first", 1, 0, 0);
         assertFalse(result);
     }
 
     // Condition 11: Invalid/same airport
     @Test
     void testInvalidAirport() {
-        boolean result = fs.runFlightSearch("08/10/2025", "xxx", false, "15/10/2025", "mel", "economy", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "xxx", false, "19/10/2025", "mel", "economy", 1, 0, 0);
         assertFalse(result);
     }
 
     @Test
     void testSameAirports() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "syd", "economy", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "syd", "economy", 1, 0, 0);
         assertFalse(result);
     }
 
     // Valid cases (4 combinations)
     @Test
     void testAllValid_EconomyNoEmergency() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "economy", 1, 0, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "economy", 1, 0, 0);
         assertTrue(result);
     }
 
     @Test
     void testAllValid_PremiumEconomyMaxChildren() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "premium economy", 2, 4, 0);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "premium economy", 2, 4, 0);
         assertTrue(result);
     }
 
     @Test
     void testAllValid_BusinessWithInfant() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "premium economy", 1, 0, 1);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "premium economy", 1, 0, 1);
         assertTrue(result);
     }
 
     @Test
     void testAllValid_FirstWithMaxChildren() {
-        boolean result = fs.runFlightSearch("08/10/2025", "syd", false, "15/10/2025", "mel", "first", 1, 0, 1);
+        boolean result = fs.runFlightSearch("12/10/2025", "syd", false, "19/10/2025", "mel", "first", 1, 0, 1);
         assertTrue(result);
     }
 
@@ -374,10 +374,10 @@ class FlightSearchTest {
         descriptions.put("testInfantsExceed1PerAdult_Boundary2", "Condition 5: Infants >1 per adult (boundary: 2 infants with 1 adult)");
         descriptions.put("testInfantsExceed1PerAdult_MixedBoundary", "Condition 5: Infants >1 per adult (boundary: 3 infants with 2 adults)");
         descriptions.put("testDepartureInPast", "Condition 6: Departure date in past (01/10/2025)");
-        descriptions.put("testDepartureInPast_BoundaryDayBefore", "Condition 6: Departure date in past (boundary: day before current, 07/10/2025)");
-        descriptions.put("testInvalidDateFormat", "Condition 7: Invalid date format (08-10-2025)");
+        descriptions.put("testDepartureInPast_BoundaryDayBefore", "Condition 6: Departure date in past (boundary: day before current, 09/10/2025)");
+        descriptions.put("testInvalidDateFormat", "Condition 7: Invalid date format (12-10-2025)");
         descriptions.put("testInvalidDate_LeapYearFail", "Condition 7: Invalid date (29/02/2026, non-leap year)");
-        descriptions.put("testReturnBeforeDeparture", "Condition 8: Return date before departure (07/10/2025)");
+        descriptions.put("testReturnBeforeDeparture", "Condition 8: Return date before departure (11/10/2025)");
         descriptions.put("testReturnBeforeDeparture_BoundaryWellBefore", "Condition 8: Return date before departure (boundary: well before, 01/10/2025)");
         descriptions.put("testInvalidSeatingClass", "Condition 9: Invalid seating class (luxury)");
         descriptions.put("testInvalidSeatingClass_BoundarySimilar", "Condition 9: Invalid seating class (boundary: coach)");
