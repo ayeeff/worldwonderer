@@ -7,9 +7,14 @@ This is a Java 17 Maven project that implements flight search parameter validati
 - **Language**: Java 17
 - **Build Tool**: Maven
 - **Testing Framework**: JUnit Jupiter 5.10.3
+- **pom.xml**: pom.xml
+The pom.xml file configures the Maven build tool for the project, specifying Java 17 compatibility, dependencies like JUnit for testing, and plugins for compiling code and running tests or demos. It ensures consistent builds across environments, allowing easy commands like mvn test to validate the flight search logic without manual setup.
 - **Main Class**: `src/main/java/flight/FlightSearch.java`
+This main class implements the core flight search validation, checking parameters like dates, airports, and passengers against 11 business rules before storing valid details. It uses strict date parsing and whitelists for airports and classes to enforce data integrity in booking systems.
 - **Test Class**: `src/test/java/flight/FlightSearchTest.java`
+The test class uses JUnit to run 28 targeted tests covering edge cases for each validation condition, ensuring the main class handles failures like invalid dates or excess passengers correctly. It includes a manual runner for quick execution and reporting, achieving full coverage for reliable software.
 - **Demo Class**: `src/main/java/flight/FlightSearchDemo.java`
+This demo class runs a sample valid flight search to showcase the main class in action, printing parameters and results for easy understanding. It also invokes tests via reflection based on command-line args, providing a user-friendly way to demo and verify the application without an IDE.
 
 ## Validation Rules
 The `runFlightSearch` method validates:
