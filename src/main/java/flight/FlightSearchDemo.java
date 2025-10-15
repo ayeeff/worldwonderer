@@ -59,18 +59,18 @@ public class FlightSearchDemo {
                 total++;
                 String methodName = test[0];
                 String description = test[1];
-                System.out.print("Testing: " + description + " ... ");
+                System.out.print("Validation: " + description + " ... ");
                 
                 try {
                     Object testInstance = testClass.getDeclaredConstructor().newInstance();
                     java.lang.reflect.Method method = testClass.getDeclaredMethod(methodName);
                     method.setAccessible(true);
                     method.invoke(testInstance);
-                    System.out.println("✓ PASS");
+                    System.out.println("✓ TRUE");
                     passed++;
                 } catch (java.lang.reflect.InvocationTargetException e) {
                     Throwable cause = e.getCause();
-                    System.out.println("✗ FAIL");
+                    System.out.println("✗ FALSE");
                     if (cause != null) {
                         System.out.println("  Error: " + cause.getMessage());
                     }
