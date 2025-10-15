@@ -9,7 +9,12 @@ import org.junit.jupiter.api.*;
 /**
  * JUnit 5 test class for FlightSearch::runFlightSearch
  * Tests all 11 conditions plus a comprehensive valid input test.
- * Each test verifies both return value AND attribute initialization.
+ * Each test verifies both return value AND attribute initialization status.
+ * 
+ * IMPORTANT: Per Note 7, tests must verify:
+ * - Return value matches expected (true/false)
+ * - Attributes ARE initialized when validation succeeds
+ * - Attributes ARE NOT initialized when validation fails
  */
 class FlightSearchTest {
 
@@ -42,8 +47,19 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               0, 0, 0);
-        assertFalse(result1, "Total passengers = 0 should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized when total = 0");
+        
+        // Verify return value is false
+        assertFalse(result1, "Test Data 1: Total passengers = 0 should return false");
+        
+        // Verify attributes were NOT initialized (remain null/default)
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
+        assertNull(fs1.getDepartureAirportCode(), "Test Data 1: departureAirportCode should remain null when validation fails");
+        assertNull(fs1.getReturnDate(), "Test Data 1: returnDate should remain null when validation fails");
+        assertNull(fs1.getDestinationAirportCode(), "Test Data 1: destinationAirportCode should remain null when validation fails");
+        assertNull(fs1.getSeatingClass(), "Test Data 1: seatingClass should remain null when validation fails");
+        assertEquals(0, fs1.getAdultPassengerCount(), "Test Data 1: adultPassengerCount should remain 0 when validation fails");
+        assertEquals(0, fs1.getChildPassengerCount(), "Test Data 1: childPassengerCount should remain 0 when validation fails");
+        assertEquals(0, fs1.getInfantPassengerCount(), "Test Data 1: infantPassengerCount should remain 0 when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -51,8 +67,19 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               9, 1, 0);
-        assertFalse(result2, "Total passengers = 10 should be invalid");
-        assertAttributesNotInitialized(fs2, "Attributes should not be initialized when total > 9");
+        
+        // Verify return value is false
+        assertFalse(result2, "Test Data 2: Total passengers = 10 should return false");
+        
+        // Verify attributes were NOT initialized
+        assertNull(fs2.getDepartureDate(), "Test Data 2: departureDate should remain null when validation fails");
+        assertNull(fs2.getDepartureAirportCode(), "Test Data 2: departureAirportCode should remain null when validation fails");
+        assertNull(fs2.getReturnDate(), "Test Data 2: returnDate should remain null when validation fails");
+        assertNull(fs2.getDestinationAirportCode(), "Test Data 2: destinationAirportCode should remain null when validation fails");
+        assertNull(fs2.getSeatingClass(), "Test Data 2: seatingClass should remain null when validation fails");
+        assertEquals(0, fs2.getAdultPassengerCount(), "Test Data 2: adultPassengerCount should remain 0 when validation fails");
+        assertEquals(0, fs2.getChildPassengerCount(), "Test Data 2: childPassengerCount should remain 0 when validation fails");
+        assertEquals(0, fs2.getInfantPassengerCount(), "Test Data 2: infantPassengerCount should remain 0 when validation fails");
     }
 
     /**
@@ -69,8 +96,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, "first", 
                                               1, 1, 0);
-        assertFalse(result1, "Children in first class should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized with children in first class");
+        
+        assertFalse(result1, "Test Data 1: Children in first class should return false");
+        assertNull(fs1.getSeatingClass(), "Test Data 1: seatingClass should remain null when validation fails");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -78,8 +107,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, VALID_DEP, true, 
                                               VALID_RET_DATE, VALID_DES, "economy", 
                                               1, 1, 0);
-        assertFalse(result2, "Children in emergency row should be invalid");
-        assertAttributesNotInitialized(fs2, "Attributes should not be initialized with children in emergency row");
+        
+        assertFalse(result2, "Test Data 2: Children in emergency row should return false");
+        assertFalse(fs2.isEmergencyRowSeating(), "Test Data 2: emergencyRowSeating should remain false when validation fails");
+        assertNull(fs2.getDepartureDate(), "Test Data 2: departureDate should remain null when validation fails");
     }
 
     /**
@@ -96,8 +127,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, "business", 
                                               1, 0, 1);
-        assertFalse(result1, "Infants in business class should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized with infants in business class");
+        
+        assertFalse(result1, "Test Data 1: Infants in business class should return false");
+        assertNull(fs1.getSeatingClass(), "Test Data 1: seatingClass should remain null when validation fails");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -105,8 +138,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, VALID_DEP, true, 
                                               VALID_RET_DATE, VALID_DES, "economy", 
                                               1, 0, 1);
-        assertFalse(result2, "Infants in emergency row should be invalid");
-        assertAttributesNotInitialized(fs2, "Attributes should not be initialized with infants in emergency row");
+        
+        assertFalse(result2, "Test Data 2: Infants in emergency row should return false");
+        assertFalse(fs2.isEmergencyRowSeating(), "Test Data 2: emergencyRowSeating should remain false when validation fails");
+        assertNull(fs2.getDepartureDate(), "Test Data 2: departureDate should remain null when validation fails");
     }
 
     /**
@@ -123,8 +158,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               1, 3, 0);
-        assertFalse(result1, "3 children with 1 adult should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized when child ratio exceeded");
+        
+        assertFalse(result1, "Test Data 1: 3 children with 1 adult should return false");
+        assertEquals(0, fs1.getChildPassengerCount(), "Test Data 1: childPassengerCount should remain 0 when validation fails");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -132,9 +169,11 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               2, 4, 0);
-        assertTrue(result2, "4 children with 2 adults should be valid");
-        assertAttributesInitialized(fs2, VALID_DEP_DATE, VALID_DEP, false, VALID_RET_DATE, 
-                                    VALID_DES, VALID_CLASS, 2, 4, 0);
+        
+        assertTrue(result2, "Test Data 2: 4 children with 2 adults should return true");
+        assertEquals(2, fs2.getAdultPassengerCount(), "Test Data 2: adultPassengerCount should be initialized to 2");
+        assertEquals(4, fs2.getChildPassengerCount(), "Test Data 2: childPassengerCount should be initialized to 4");
+        assertEquals(VALID_DEP_DATE, fs2.getDepartureDate(), "Test Data 2: departureDate should be initialized");
     }
 
     /**
@@ -151,8 +190,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               1, 0, 2);
-        assertFalse(result1, "2 infants with 1 adult should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized when infant ratio exceeded");
+        
+        assertFalse(result1, "Test Data 1: 2 infants with 1 adult should return false");
+        assertEquals(0, fs1.getInfantPassengerCount(), "Test Data 1: infantPassengerCount should remain 0 when validation fails");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -160,8 +201,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               0, 0, 1);
-        assertFalse(result2, "1 infant with 0 adults should be invalid");
-        assertAttributesNotInitialized(fs2, "Attributes should not be initialized with infant but no adult");
+        
+        assertFalse(result2, "Test Data 2: 1 infant with 0 adults should return false");
+        assertEquals(0, fs2.getInfantPassengerCount(), "Test Data 2: infantPassengerCount should remain 0 when validation fails");
+        assertNull(fs2.getDepartureDate(), "Test Data 2: departureDate should remain null when validation fails");
     }
 
     /**
@@ -178,8 +221,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(YESTERDAY_STR, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               1, 0, 0);
-        assertFalse(result1, "Departure date in past should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized with past departure date");
+        
+        assertFalse(result1, "Test Data 1: Departure date in past should return false");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
+        assertNull(fs1.getReturnDate(), "Test Data 1: returnDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -187,9 +232,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(TOMORROW_STR, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               1, 0, 0);
-        assertTrue(result2, "Tomorrow's departure date should be valid");
-        assertAttributesInitialized(fs2, TOMORROW_STR, VALID_DEP, false, VALID_RET_DATE, 
-                                    VALID_DES, VALID_CLASS, 1, 0, 0);
+        
+        assertTrue(result2, "Test Data 2: Tomorrow's departure date should return true");
+        assertEquals(TOMORROW_STR, fs2.getDepartureDate(), "Test Data 2: departureDate should be initialized");
+        assertEquals(VALID_RET_DATE, fs2.getReturnDate(), "Test Data 2: returnDate should be initialized");
     }
 
     /**
@@ -206,8 +252,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch("29/02/2026", VALID_DEP, false, 
                                               "07/03/2026", VALID_DES, VALID_CLASS, 
                                               1, 0, 0);
-        assertFalse(result1, "29/02/2026 (non-leap year) should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized with invalid date");
+        
+        assertFalse(result1, "Test Data 1: 29/02/2026 (non-leap year) should return false");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
+        assertNull(fs1.getReturnDate(), "Test Data 1: returnDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -215,8 +263,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch("31/04/2025", VALID_DEP, false, 
                                               "07/05/2025", VALID_DES, VALID_CLASS, 
                                               1, 0, 0);
-        assertFalse(result2, "31/04/2025 (invalid day for April) should be invalid");
-        assertAttributesNotInitialized(fs2, "Attributes should not be initialized with invalid date");
+        
+        assertFalse(result2, "Test Data 2: 31/04/2025 (invalid day for April) should return false");
+        assertNull(fs2.getDepartureDate(), "Test Data 2: departureDate should remain null when validation fails");
+        assertNull(fs2.getReturnDate(), "Test Data 2: returnDate should remain null when validation fails");
     }
 
     /**
@@ -234,8 +284,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_RET_DATE, VALID_DEP, false, 
                                               dayBefore, VALID_DES, VALID_CLASS, 
                                               1, 0, 0);
-        assertFalse(result1, "Return date before departure should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized when return before departure");
+        
+        assertFalse(result1, "Test Data 1: Return date before departure should return false");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
+        assertNull(fs1.getReturnDate(), "Test Data 1: returnDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -243,9 +295,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_DEP_DATE, VALID_DES, VALID_CLASS, 
                                               1, 0, 0);
-        assertTrue(result2, "Return date same as departure should be valid");
-        assertAttributesInitialized(fs2, VALID_DEP_DATE, VALID_DEP, false, VALID_DEP_DATE, 
-                                    VALID_DES, VALID_CLASS, 1, 0, 0);
+        
+        assertTrue(result2, "Test Data 2: Return date same as departure should return true");
+        assertEquals(VALID_DEP_DATE, fs2.getDepartureDate(), "Test Data 2: departureDate should be initialized");
+        assertEquals(VALID_DEP_DATE, fs2.getReturnDate(), "Test Data 2: returnDate should be initialized");
     }
 
     /**
@@ -262,8 +315,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, "luxury", 
                                               1, 0, 0);
-        assertFalse(result1, "Seating class 'luxury' should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized with invalid seating class");
+        
+        assertFalse(result1, "Test Data 1: Seating class 'luxury' should return false");
+        assertNull(fs1.getSeatingClass(), "Test Data 1: seatingClass should remain null when validation fails");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -271,9 +326,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, VALID_DEP, false, 
                                               VALID_RET_DATE, VALID_DES, "premium economy", 
                                               1, 0, 0);
-        assertTrue(result2, "Seating class 'premium economy' should be valid");
-        assertAttributesInitialized(fs2, VALID_DEP_DATE, VALID_DEP, false, VALID_RET_DATE, 
-                                    VALID_DES, "premium economy", 1, 0, 0);
+        
+        assertTrue(result2, "Test Data 2: Seating class 'premium economy' should return true");
+        assertEquals("premium economy", fs2.getSeatingClass(), "Test Data 2: seatingClass should be initialized");
+        assertEquals(VALID_DEP_DATE, fs2.getDepartureDate(), "Test Data 2: departureDate should be initialized");
     }
 
     /**
@@ -290,8 +346,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_DEP_DATE, VALID_DEP, true, 
                                               VALID_RET_DATE, VALID_DES, "business", 
                                               1, 0, 0);
-        assertFalse(result1, "Emergency row with business class should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized with emergency row in non-economy");
+        
+        assertFalse(result1, "Test Data 1: Emergency row with business class should return false");
+        assertFalse(fs1.isEmergencyRowSeating(), "Test Data 1: emergencyRowSeating should remain false when validation fails");
+        assertNull(fs1.getDepartureDate(), "Test Data 1: departureDate should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -299,9 +357,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, VALID_DEP, true, 
                                               VALID_RET_DATE, VALID_DES, "economy", 
                                               1, 0, 0);
-        assertTrue(result2, "Emergency row with economy class should be valid");
-        assertAttributesInitialized(fs2, VALID_DEP_DATE, VALID_DEP, true, VALID_RET_DATE, 
-                                    VALID_DES, "economy", 1, 0, 0);
+        
+        assertTrue(result2, "Test Data 2: Emergency row with economy class should return true");
+        assertTrue(fs2.isEmergencyRowSeating(), "Test Data 2: emergencyRowSeating should be initialized to true");
+        assertEquals(VALID_DEP_DATE, fs2.getDepartureDate(), "Test Data 2: departureDate should be initialized");
     }
 
     /**
@@ -318,8 +377,10 @@ class FlightSearchTest {
         boolean result1 = fs1.runFlightSearch(VALID_DEP_DATE, "syd", false, 
                                               VALID_RET_DATE, "syd", VALID_CLASS, 
                                               1, 0, 0);
-        assertFalse(result1, "Same departure and destination should be invalid");
-        assertAttributesNotInitialized(fs1, "Attributes should not be initialized when departure equals destination");
+        
+        assertFalse(result1, "Test Data 1: Same departure and destination should return false");
+        assertNull(fs1.getDepartureAirportCode(), "Test Data 1: departureAirportCode should remain null when validation fails");
+        assertNull(fs1.getDestinationAirportCode(), "Test Data 1: destinationAirportCode should remain null when validation fails");
 
         FlightSearch fs2 = new FlightSearch();
         
@@ -327,8 +388,10 @@ class FlightSearchTest {
         boolean result2 = fs2.runFlightSearch(VALID_DEP_DATE, "xyz", false, 
                                               VALID_RET_DATE, VALID_DES, VALID_CLASS, 
                                               1, 0, 0);
-        assertFalse(result2, "Invalid airport code 'xyz' should be invalid");
-        assertAttributesNotInitialized(fs2, "Attributes should not be initialized with invalid airport code");
+        
+        assertFalse(result2, "Test Data 2: Invalid airport code 'xyz' should return false");
+        assertNull(fs2.getDepartureAirportCode(), "Test Data 2: departureAirportCode should remain null when validation fails");
+        assertNull(fs2.getDestinationAirportCode(), "Test Data 2: destinationAirportCode should remain null when validation fails");
     }
 
     /**
@@ -347,8 +410,17 @@ class FlightSearchTest {
         
         // Test Data 1: 2 adults, 2 children, economy
         boolean result1 = fs1.runFlightSearch(date1, "syd", false, ret1, "pvg", "economy", 2, 2, 0);
-        assertTrue(result1, "All valid inputs (Test Data 1) should be valid");
-        assertAttributesInitialized(fs1, date1, "syd", false, ret1, "pvg", "economy", 2, 2, 0);
+        
+        assertTrue(result1, "Test Data 1: All valid inputs should return true");
+        assertEquals(date1, fs1.getDepartureDate(), "Test Data 1: departureDate should be initialized");
+        assertEquals("syd", fs1.getDepartureAirportCode(), "Test Data 1: departureAirportCode should be initialized");
+        assertFalse(fs1.isEmergencyRowSeating(), "Test Data 1: emergencyRowSeating should be initialized to false");
+        assertEquals(ret1, fs1.getReturnDate(), "Test Data 1: returnDate should be initialized");
+        assertEquals("pvg", fs1.getDestinationAirportCode(), "Test Data 1: destinationAirportCode should be initialized");
+        assertEquals("economy", fs1.getSeatingClass(), "Test Data 1: seatingClass should be initialized");
+        assertEquals(2, fs1.getAdultPassengerCount(), "Test Data 1: adultPassengerCount should be initialized");
+        assertEquals(2, fs1.getChildPassengerCount(), "Test Data 1: childPassengerCount should be initialized");
+        assertEquals(0, fs1.getInfantPassengerCount(), "Test Data 1: infantPassengerCount should be initialized");
 
         String date2 = TOMORROW_STR;
         String ret2 = TODAY.plusDays(21).format(DF);
@@ -356,8 +428,14 @@ class FlightSearchTest {
         
         // Test Data 2: 1 adult, 1 infant, economy
         boolean result2 = fs2.runFlightSearch(date2, "mel", false, ret2, "lax", "economy", 1, 0, 1);
-        assertTrue(result2, "All valid inputs (Test Data 2) should be valid");
-        assertAttributesInitialized(fs2, date2, "mel", false, ret2, "lax", "economy", 1, 0, 1);
+        
+        assertTrue(result2, "Test Data 2: All valid inputs should return true");
+        assertEquals(date2, fs2.getDepartureDate(), "Test Data 2: departureDate should be initialized");
+        assertEquals("mel", fs2.getDepartureAirportCode(), "Test Data 2: departureAirportCode should be initialized");
+        assertEquals(ret2, fs2.getReturnDate(), "Test Data 2: returnDate should be initialized");
+        assertEquals("lax", fs2.getDestinationAirportCode(), "Test Data 2: destinationAirportCode should be initialized");
+        assertEquals(1, fs2.getAdultPassengerCount(), "Test Data 2: adultPassengerCount should be initialized");
+        assertEquals(1, fs2.getInfantPassengerCount(), "Test Data 2: infantPassengerCount should be initialized");
 
         String date3 = TOMORROW_STR;
         String ret3 = TODAY.plusDays(10).format(DF);
@@ -365,8 +443,14 @@ class FlightSearchTest {
         
         // Test Data 3: 3 adults, emergency row, economy
         boolean result3 = fs3.runFlightSearch(date3, "doh", true, ret3, "cdg", "economy", 3, 0, 0);
-        assertTrue(result3, "All valid inputs (Test Data 3) should be valid");
-        assertAttributesInitialized(fs3, date3, "doh", true, ret3, "cdg", "economy", 3, 0, 0);
+        
+        assertTrue(result3, "Test Data 3: All valid inputs should return true");
+        assertEquals(date3, fs3.getDepartureDate(), "Test Data 3: departureDate should be initialized");
+        assertEquals("doh", fs3.getDepartureAirportCode(), "Test Data 3: departureAirportCode should be initialized");
+        assertTrue(fs3.isEmergencyRowSeating(), "Test Data 3: emergencyRowSeating should be initialized to true");
+        assertEquals(ret3, fs3.getReturnDate(), "Test Data 3: returnDate should be initialized");
+        assertEquals("cdg", fs3.getDestinationAirportCode(), "Test Data 3: destinationAirportCode should be initialized");
+        assertEquals(3, fs3.getAdultPassengerCount(), "Test Data 3: adultPassengerCount should be initialized");
 
         String date4 = TOMORROW_STR;
         String ret4 = TODAY.plusDays(5).format(DF);
@@ -374,45 +458,14 @@ class FlightSearchTest {
         
         // Test Data 4: 1 adult, 1 child, premium economy
         boolean result4 = fs4.runFlightSearch(date4, "del", false, ret4, "syd", "premium economy", 1, 1, 0);
-        assertTrue(result4, "All valid inputs (Test Data 4) should be valid");
-        assertAttributesInitialized(fs4, date4, "del", false, ret4, "syd", "premium economy", 1, 1, 0);
-    }
-
-    /* ========== HELPER METHODS FOR ATTRIBUTE VERIFICATION ========== */
-
-    /**
-     * Verifies that all attributes remain uninitialized (null or default values)
-     * This should be the case when validation fails.
-     */
-    private void assertAttributesNotInitialized(FlightSearch fs, String message) {
-        assertNull(fs.getDepartureDate(), message + ": departureDate should be null");
-        assertNull(fs.getDepartureAirportCode(), message + ": departureAirportCode should be null");
-        assertFalse(fs.isEmergencyRowSeating(), message + ": emergencyRowSeating should be false");
-        assertNull(fs.getReturnDate(), message + ": returnDate should be null");
-        assertNull(fs.getDestinationAirportCode(), message + ": destinationAirportCode should be null");
-        assertNull(fs.getSeatingClass(), message + ": seatingClass should be null");
-        assertEquals(0, fs.getAdultPassengerCount(), message + ": adultPassengerCount should be 0");
-        assertEquals(0, fs.getChildPassengerCount(), message + ": childPassengerCount should be 0");
-        assertEquals(0, fs.getInfantPassengerCount(), message + ": infantPassengerCount should be 0");
-    }
-
-    /**
-     * Verifies that all attributes are properly initialized with expected values
-     * This should be the case when validation succeeds.
-     */
-    private void assertAttributesInitialized(FlightSearch fs, 
-                                            String expectedDepDate, String expectedDepAirport,
-                                            boolean expectedEmergency, String expectedRetDate,
-                                            String expectedDestAirport, String expectedClass,
-                                            int expectedAdults, int expectedChildren, int expectedInfants) {
-        assertEquals(expectedDepDate, fs.getDepartureDate(), "departureDate should be initialized");
-        assertEquals(expectedDepAirport, fs.getDepartureAirportCode(), "departureAirportCode should be initialized");
-        assertEquals(expectedEmergency, fs.isEmergencyRowSeating(), "emergencyRowSeating should be initialized");
-        assertEquals(expectedRetDate, fs.getReturnDate(), "returnDate should be initialized");
-        assertEquals(expectedDestAirport, fs.getDestinationAirportCode(), "destinationAirportCode should be initialized");
-        assertEquals(expectedClass, fs.getSeatingClass(), "seatingClass should be initialized");
-        assertEquals(expectedAdults, fs.getAdultPassengerCount(), "adultPassengerCount should be initialized");
-        assertEquals(expectedChildren, fs.getChildPassengerCount(), "childPassengerCount should be initialized");
-        assertEquals(expectedInfants, fs.getInfantPassengerCount(), "infantPassengerCount should be initialized");
+        
+        assertTrue(result4, "Test Data 4: All valid inputs should return true");
+        assertEquals(date4, fs4.getDepartureDate(), "Test Data 4: departureDate should be initialized");
+        assertEquals("del", fs4.getDepartureAirportCode(), "Test Data 4: departureAirportCode should be initialized");
+        assertEquals(ret4, fs4.getReturnDate(), "Test Data 4: returnDate should be initialized");
+        assertEquals("syd", fs4.getDestinationAirportCode(), "Test Data 4: destinationAirportCode should be initialized");
+        assertEquals("premium economy", fs4.getSeatingClass(), "Test Data 4: seatingClass should be initialized");
+        assertEquals(1, fs4.getAdultPassengerCount(), "Test Data 4: adultPassengerCount should be initialized");
+        assertEquals(1, fs4.getChildPassengerCount(), "Test Data 4: childPassengerCount should be initialized");
     }
 }
